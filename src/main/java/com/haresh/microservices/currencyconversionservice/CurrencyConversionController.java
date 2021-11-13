@@ -1,5 +1,6 @@
 package com.haresh.microservices.currencyconversionservice;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +12,9 @@ import java.util.HashMap;
 
 @RestController
 public class CurrencyConversionController {
+
+    @Autowired
+    CurrencyExchangeProxy proxy;
 
     @GetMapping("/currency-conversion/from/{from}/to/{to}/quantity/{quantity}")
     public CurrencyConversion calculateCurrencyConversion(
@@ -27,7 +31,21 @@ public class CurrencyConversionController {
                 uriVariables);
 
         CurrencyConversion currencyConversion = entity.getBody();
-        System.out.println(currencyConversion);
+        if (currencyConversion == null) {
+            throw new RuntimeException("Unable to convert the currency value from " + from + " to " + to);
+        }
+        currencyConversion.setTotalCalculatedAmount(quantity.multiply(currencyConversion.getConversionMultiple()));
+
+        return currencyConversion;
+    }
+
+    @GetMapping("/currency-conversion-feign/from/{from}/to/{to}/quantity/{quantity}")
+    public CurrencyConversion calculateCurrencyConversionFeign(
+            @PathVariable String from,
+            @PathVariable String to,
+            @PathVariable BigDecimal quantity) {
+
+        CurrencyConversion currencyConversion = proxy.retrieveExchangeValue(from, to);
         if (currencyConversion == null) {
             throw new RuntimeException("Unable to convert the currency value from " + from + " to " + to);
         }
