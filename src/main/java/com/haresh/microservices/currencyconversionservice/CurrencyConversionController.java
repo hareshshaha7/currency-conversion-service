@@ -34,6 +34,7 @@ public class CurrencyConversionController {
         if (currencyConversion == null) {
             throw new RuntimeException("Unable to convert the currency value from " + from + " to " + to);
         }
+        currencyConversion.setEnvironment(currencyConversion.getEnvironment() + " from Rest Service");
         currencyConversion.setTotalCalculatedAmount(quantity.multiply(currencyConversion.getConversionMultiple()));
 
         return currencyConversion;
@@ -49,6 +50,7 @@ public class CurrencyConversionController {
         if (currencyConversion == null) {
             throw new RuntimeException("Unable to convert the currency value from " + from + " to " + to);
         }
+        currencyConversion.setEnvironment(currencyConversion.getEnvironment() + " from Feign");
         currencyConversion.setTotalCalculatedAmount(quantity.multiply(currencyConversion.getConversionMultiple()));
 
         return currencyConversion;
